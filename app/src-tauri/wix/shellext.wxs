@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Wix fragment that ships the Xolariq COM `IExplorerCommand` shell
+  extension (`xolariq_shellext.dll`) alongside the main executable and
+  registers it on install / unregisters on uninstall.
+
+  ## Layout
+
+  Tauri's MSI bundler emits the main payload (xolariq.exe + sidecars +
+  resources + this fragment) into `[INSTALLDIR]`. The shell extension
+  DLL is built separately by the workspace's `xolariq-shellext` cdylib
+  crate and copied into `app/src-tauri/external/` before invoking
+  `cargo tauri build` (see `BUILD.md`). The Wix component below picks
+  it up from that staging directory.
+
+  ## Registration strategy
+
+  The DLL self-registers via `DllRegisterServer` / `DllUnregisterServer`
+  exports — both write to `HKEY_CURRENT_USER`, so no admin elevation is
+  needed. We drive both via `regsvr32 /s` custom actions; the
+  `regsvr32` binary lives in `System32` on every supported Windows
+  build, so we don't ship it.
+
+  This fragment is referenced from
+  `app/src-tauri/tauri.conf.json` via `bundle.windows.wix.fragmentPaths`
+  + `componentRefs`.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <!-- The DLL itself. KeyPath="yes" so Windows Installer treats this
+         file as the canonical resource for repair / uninstall. -->
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="XolariqShellExtComponent"
+                 Guid="*"
+                 Win64="yes">
+        <File Id="XolariqShellExtDll"
+              Source="$(sys.SOURCEFILEDIR)..\external\xolariq_shellext.dll"
+              Name="xolariq_shellext.dll"
+              KeyPath="yes" />
+      </Component>
+      <Component Id="XolariqSettingsIcoComponent"
+                 Guid="*"
+                 Win64="yes">
+        <File Id="XolariqSettingsIco"
+              Source="$(sys.SOURCEFILEDIR)..\external\settings.ico"
+              Name="settings.ico"
+              KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Custom actions: invoke regsvr32 against the installed DLL.
+         Quiet mode (/s) suppresses the success dialog. The DLL writes
+         only HKCU keys via `DllRegisterServer`, so the actions run as
+         the installing user (immediate execution) and do not need to
+         be deferred or elevated.
+
+         If the install context ever changes to per-machine, switch
+         these to deferred/system-context custom actions and forward
+         INSTALLDIR via a SetProperty / `CustomActionData` pair (the
+         deferred property whitelist excludes INSTALLDIR by default). -->
+    <CustomAction Id="RegisterXolariqShellExt"
+                  Directory="INSTALLDIR"
+                  ExeCommand='regsvr32.exe /s "[INSTALLDIR]xolariq_shellext.dll"'
+                  Execute="immediate"
+                  Return="ignore" />
+    <CustomAction Id="UnregisterXolariqShellExt"
+                  Directory="INSTALLDIR"
+                  ExeCommand='regsvr32.exe /s /u "[INSTALLDIR]xolariq_shellext.dll"'
+                  Execute="immediate"
+                  Return="ignore" />
+
+    <InstallExecuteSequence>
+      <Custom Action="RegisterXolariqShellExt"
+              After="InstallFiles">NOT Installed</Custom>
+      <Custom Action="UnregisterXolariqShellExt"
+              Before="RemoveFiles">REMOVE="ALL"</Custom>
+    </InstallExecuteSequence>
+  </Fragment>
+</Wix>

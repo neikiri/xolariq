@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Xolariq — Converting</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1 id="heading">Preparing…</h1>
+        <p class="muted" id="counter"></p>
+      </header>
+
+      <section class="card">
+        <p class="truncate" id="current-file">—</p>
+        <progress id="bar" max="100" value="0"></progress>
+        <p class="muted" id="output-path"></p>
+      </section>
+
+      <section id="error-card" class="card error" hidden>
+        <p id="error-message"></p>
+      </section>
+
+      <footer>
+        <button id="cancel-btn" class="danger">Cancel</button>
+        <button id="close-btn" class="primary" hidden>Close</button>
+      </footer>
+    </main>
+
+    <script src="progress.js" type="module"></script>
+  </body>
+</html>

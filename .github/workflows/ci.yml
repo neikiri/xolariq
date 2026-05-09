@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  # Run on every PR regardless of target branch so chained PRs (e.g.
+  # PR #2 layered on top of PR #1's branch) still get the same lint /
+  # build coverage as PRs against main.
+  pull_request:
+
+jobs:
+  # The core conversion engine and the shell-integration crate are pure Rust
+  # and have no system dependencies (the Windows-only registry code is
+  # gated behind cfg(windows)). Running them on Ubuntu gives us fast
+  # feedback for fmt / clippy / tests on every PR.
+  core-checks:
+    name: core + shell (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+      - name: cargo clippy (core + shell)
+        run: cargo clippy -p xolariq-core -p xolariq-shell --all-targets -- -D warnings
+      - name: cargo test (core)
+        run: cargo test -p xolariq-core --all-targets
+
+  # The Tauri app pulls in WebView2 + Windows-only plugins, so we
+  # cargo-check it on a Windows runner. We don't build the bundle here —
+  # that requires WiX/NSIS and is reserved for the release workflow.
+  tauri-check:
+    name: tauri app (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # tauri-build embeds an icon into the Windows resource, so the cargo
+      # check fails without one. The repo deliberately ships without bundled
+      # binary art (devs run `cargo tauri icon` against their own source),
+      # so we synthesise tiny placeholder PNG/ICO files for CI only.
+      - name: generate placeholder icons
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.Drawing
+          $iconsDir = "app/src-tauri/icons"
+          New-Item -ItemType Directory -Force -Path $iconsDir | Out-Null
+          foreach ($size in 32, 128) {
+            $bmp = New-Object System.Drawing.Bitmap $size, $size
+            $g = [System.Drawing.Graphics]::FromImage($bmp)
+            $g.Clear([System.Drawing.Color]::FromArgb(255, 30, 144, 255))
+            $bmp.Save("$iconsDir/${size}x${size}.png", [System.Drawing.Imaging.ImageFormat]::Png)
+            $g.Dispose()
+            $bmp.Dispose()
+          }
+          $pngBytes = [System.IO.File]::ReadAllBytes("$iconsDir/128x128.png")
+          $stream = New-Object System.IO.MemoryStream
+          $bw = New-Object System.IO.BinaryWriter $stream
+          $bw.Write([UInt16]0)                        # reserved
+          $bw.Write([UInt16]1)                        # type = icon
+          $bw.Write([UInt16]1)                        # image count
+          $bw.Write([Byte]128)                        # width
+          $bw.Write([Byte]128)                        # height
+          $bw.Write([Byte]0)                          # color palette count
+          $bw.Write([Byte]0)                          # reserved
+          $bw.Write([UInt16]1)                        # color planes
+          $bw.Write([UInt16]32)                       # bits per pixel
+          $bw.Write([UInt32]$pngBytes.Length)         # size of image data
+          $bw.Write([UInt32]22)                       # offset (6-byte header + 16-byte entry)
+          $bw.Write($pngBytes)
+          $bw.Flush()
+          [System.IO.File]::WriteAllBytes("$iconsDir/icon.ico", $stream.ToArray())
+      # tauri-build also validates that every `externalBin` path resolves
+      # at build time (with the platform triple suffix appended). The repo
+      # deliberately doesn't commit ffmpeg/pandoc/7za, so synthesise empty
+      # placeholder .exes for CI. They are never executed — cargo check
+      # just needs the files to exist.
+      - name: generate placeholder externalBin sidecars
+        shell: pwsh
+        run: |
+          $extDir = "app/src-tauri/external"
+          New-Item -ItemType Directory -Force -Path $extDir | Out-Null
+          foreach ($t in "ffmpeg","pandoc","p7za") {
+            $path = "$extDir/$t-x86_64-pc-windows-msvc.exe"
+            New-Item -ItemType File -Force -Path $path | Out-Null
+          }
+      - name: cargo check (workspace)
+        run: cargo check --workspace --all-targets
+      # The COM shell extension is the only crate emitting a cdylib;
+      # build it explicitly so linker errors surface as their own job
+      # step rather than being buried in the workspace check above.
+      - name: cargo build (xolariq-shellext cdylib)
+        run: cargo build -p xolariq-shellext --lib --release

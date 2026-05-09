@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Xolariq",
+  "version": "0.1.0",
+  "identifier": "dev.xolariq.app",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "settings",
+        "title": "Xolariq — Settings",
+        "url": "settings.html",
+        "width": 540,
+        "height": 480,
+        "resizable": false,
+        "visible": false,
+        "decorations": true,
+        "center": true
+      },
+      {
+        "label": "progress",
+        "title": "Xolariq — Converting",
+        "url": "progress.html",
+        "width": 460,
+        "height": 240,
+        "resizable": false,
+        "visible": false,
+        "decorations": true,
+        "alwaysOnTop": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.ico"
+    ],
+    "publisher": "Xolariq Contributors",
+    "category": "Utility",
+    "shortDescription": "Right-click file conversion for Windows.",
+    "longDescription": "Convert audio, video, image, document and archive files directly from the Windows Explorer context menu.",
+    "externalBin": [
+      "external/ffmpeg",
+      "external/pandoc",
+      "external/p7za"
+    ],
+    "resources": [
+      "external/LICENSES/*",
+      "external/settings.ico"
+    ],
+    "windows": {
+      "wix": {
+        "language": "en-US"
+      },
+
+      "nsis": {
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

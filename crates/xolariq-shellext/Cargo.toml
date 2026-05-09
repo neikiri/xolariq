@@ -1,0 +1,39 @@
+[package]
+name = "xolariq-shellext"
+description = "Xolariq COM IExplorerCommand shell extension (Windows-only)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+# Built as a cdylib so Explorer can LoadLibrary the resulting
+# `xolariq_shellext.dll` and resolve `DllGetClassObject` /
+# `DllRegisterServer` / `DllUnregisterServer` exports directly.
+crate-type = ["cdylib"]
+
+[target.'cfg(windows)'.dependencies]
+# `windows` (Microsoft official, MIT/Apache-2.0) — gives us COM
+# IUnknown, IClassFactory, IExplorerCommand, registry helpers, etc.
+windows = { version = "0.58", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Com",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_System_SystemServices",
+    "Win32_UI_Shell",
+    "Win32_UI_Shell_PropertiesSystem",
+    "Win32_System_Ole",
+    "implement",
+] }
+windows-core = { version = "0.58" }
+
+[target.'cfg(windows)'.dependencies.windows-implement]
+version = "0.58"
+
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+targets = ["x86_64-pc-windows-msvc"]

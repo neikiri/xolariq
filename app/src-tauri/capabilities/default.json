@@ -1,0 +1,17 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capabilities granted to Xolariq's progress and settings windows.",
+  "windows": ["settings", "progress"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:event:default",
+    "notification:default",
+    "dialog:allow-open",
+    "opener:default"
+  ]
+}

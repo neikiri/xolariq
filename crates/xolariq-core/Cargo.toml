@@ -1,0 +1,29 @@
+[package]
+name = "xolariq-core"
+description = "Xolariq conversion engine: file detection, format mapping, queue, and converters."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+name = "xolariq_core"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+once_cell = { workspace = true }
+parking_lot = { workspace = true }
+uuid = { workspace = true }
+directories = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.10"
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

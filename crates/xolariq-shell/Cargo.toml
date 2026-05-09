@@ -1,0 +1,29 @@
+[package]
+name = "xolariq-shell"
+description = "Windows shell integration for Xolariq (context menu registry install/uninstall)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+name = "xolariq_shell"
+path = "src/lib.rs"
+
+[[bin]]
+name = "xolariq-shell-install"
+path = "src/bin/install.rs"
+
+[[bin]]
+name = "xolariq-shell-uninstall"
+path = "src/bin/uninstall.rs"
+
+[dependencies]
+thiserror = { workspace = true }
+tracing = { workspace = true }
+xolariq-core = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52"
