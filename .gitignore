@@ -43,5 +43,7 @@ app/src-tauri/external/*
 app/src-tauri/external/LICENSES/*
 !app/src-tauri/external/LICENSES/README.md
 
-# Photoshop
+# Design
+assets/source/
 *.psd
+*.ai

@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/logo-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="./assets/logo-light.png">
-    <img alt="logo" src="./assets/logo-light.png" width="620">
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/logos/xolariq-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./assets/logos/xolariq-logo-light.svg">
+    <img alt="logo" src="./assets/logos/xolariq-logo-light.svg" width="620">
   </picture>
 </p>
 
