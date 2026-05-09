@@ -6,6 +6,12 @@
   </picture>
 </p>
 
+<h1 align="center">Right-click file conversion for Windows.</h1>
+
+<p align="center">
+  Convert media, documents and archives directly from Explorer.
+</p>
+
 <p align="center">
   <img src="https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white" alt="Rust">
   <img src="https://img.shields.io/badge/tauri-%2324C8D8.svg?style=for-the-badge&logo=tauri&logoColor=white" alt="Tauri">
@@ -14,13 +20,6 @@
   <br>
   <img src="https://img.shields.io/badge/License-MPL%202.0-2563EB?style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=000F15&logoWidth=20" alt="License">
   <img src="https://img.shields.io/badge/Version-0.1.0-2563EB?style=for-the-badge&logo=semantic-release&logoColor=white&labelColor=000F15&logoWidth=20" alt="Version">
-</p>
-
-<h1 align="center">Xolariq</h1>
-
-<p align="center">
-  <b>Right-click file conversion for Windows.</b><br>
-  <i>A Windows context-menu file converter powered by FFmpeg, pandoc & 7-Zip.</i>
 </p>
 
 <p align="center">
