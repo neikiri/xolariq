@@ -71,6 +71,10 @@ The installer bundles everything needed — no extra downloads, no `PATH` config
 2. Run the installer. Done — no extra setup needed.
 3. Right-click any supported file in Explorer → **"Convert with Xolariq"** → pick a target format.
 
+## 📚 Documentation
+
+For a deeper user, administrator and developer guide, see [`WIKI.md`](./WIKI.md).
+
 ### Building from source
 
 If you prefer to build locally, you will need a Windows machine, Rust and the Tauri CLI. See [`BUILD.md`](./BUILD.md) for the full step-by-step guide.
