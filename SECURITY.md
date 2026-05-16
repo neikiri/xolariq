@@ -12,7 +12,7 @@ If you discover a security vulnerability in Xolariq, **please do not open a publ
 
 Instead, report it privately via email:
 
-📧 **dev@neiki.eu**
+📧 **neikiri@neikiri.dev**
 
 Please include:
 
